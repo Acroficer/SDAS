@@ -59,5 +59,7 @@ ssh.connect({
             });
         }
 
+        ssh.dispose();
+
     });
 });
