@@ -3,8 +3,8 @@ const {NodeSSH} = require('node-ssh')
 require('dotenv').config();
 
 ssh = new NodeSSH();
-
-if(process.env.Debug)
+const debugMode = Boolean(parseInt(process.env.Debug))
+if(debugMode)
 {
     console.log("Running in debug mode");
 }
@@ -58,7 +58,7 @@ ssh.connect({
 
         for(var i = 0; i < digits.length; i++)
         {
-            if(!process.env.Debug)
+            if(!debugMode)
             {
                 await ssh.execCommand(`png2sector ${parseInt(process.env.StartingSector) + i} ${digits[i]}`).then((result) =>
                 {
