@@ -4,6 +4,11 @@ require('dotenv').config();
 
 ssh = new NodeSSH();
 
+if(process.env.Debug)
+{
+    console.log("Running in debug mode");
+}
+
 ssh.connect({
     host: process.env.SSH_Host,
     username: process.env.SSH_User,
@@ -53,13 +58,14 @@ ssh.connect({
 
         for(var i = 0; i < digits.length; i++)
         {
-            await ssh.execCommand(`png2sector ${parseInt(process.env.StartingSector) + i} ${digits[i]}`).then((result) =>
+            if(!process.env.Debug)
             {
-                console.log(`Sector ${parseInt(process.env.StartingSector) + i} : ${result.stdout}`);
-            });
+                await ssh.execCommand(`png2sector ${parseInt(process.env.StartingSector) + i} ${digits[i]}`).then((result) =>
+                {
+                    console.log(`Sector ${parseInt(process.env.StartingSector) + i} : ${result.stdout}`);
+                });
+            }
         }
-
         ssh.dispose();
-
     });
 });
