@@ -5,7 +5,7 @@ require('dotenv').config();
 ssh = new NodeSSH();
 const debugMode = Boolean(parseInt(process.env.Debug))
 const sectorCount = parseInt(fs.readFileSync("./count"));
-console.log(sectorCount);
+
 if(debugMode)
 {
     console.log("Running in debug mode");
