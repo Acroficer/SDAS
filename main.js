@@ -4,10 +4,14 @@ require('dotenv').config();
 
 ssh = new NodeSSH();
 const debugMode = Boolean(parseInt(process.env.Debug))
+const sectorCount = parseInt(fs.readFileSync("./count"));
+console.log(sectorCount);
 if(debugMode)
 {
     console.log("Running in debug mode");
 }
+
+
 
 ssh.connect({
     host: process.env.SSH_Host,
@@ -21,7 +25,7 @@ ssh.connect({
         }
       }
 }).then(function() {
-    console.log("Connected")
+    if (debugMode) console.log("Connected");
     ssh.execCommand('available').then(async function(result) {
 
         var output = result.stdout.split("sectors out of")[0].split("\n");
@@ -36,7 +40,19 @@ ssh.connect({
             throw new Error(`remainingSectors should be a number, instead is ${remainingSectors}`)
         }
 
-        console.log(`Sectors Claimed: ${remainingSectors}`);
+        if (debugMode) console.log(`Sectors Claimed: ${remainingSectors}`);
+
+        if (remainingSectors == sectorCount) //check if there's been a change, if not, terminate
+        {
+            if (debugMode) console.log("Count matches, terminating");
+            ssh.dispose();
+            return;
+        }
+
+        console.log(`Update in sector count detected. Old count: ${sectorCount}. New count: ${remainingSectors}`);
+        //update the display first, then the file
+        //if something goes wrong and it terminates during the process, we'd rather accidentally update the display twice, because the file never got updated
+        //then think it is updated when it isn't.
 
         //Digits go from most to least significant
         var digits = []
@@ -52,7 +68,7 @@ ssh.connect({
                 digits = ["Blank.png"].concat(digits); //blanks appear at the end, but we want them at the beginning
             }
         }
-        console.log(`Digits: ${digits}`);
+        if (debugMode) console.log(`Digits: ${digits}`);
         //Now, use png2sector to fill them in.
         //png2sector <sector> <imgname>
 
@@ -65,6 +81,12 @@ ssh.connect({
                     console.log(`Sector ${parseInt(process.env.StartingSector) + i} : ${result.stdout}`);
                 });
             }
+        }
+
+        //now to update the file
+        if(!debugMode)
+        {
+            fs.writeFileSync("./count", remainingSectors);
         }
         ssh.dispose();
     });
