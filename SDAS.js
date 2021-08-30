@@ -1,3 +1,5 @@
+//SectorDisk Active Sectors
+//Displays how many active sectors there are
 const fs = require('fs')
 const {NodeSSH} = require('node-ssh')
 require('dotenv').config();
@@ -76,9 +78,9 @@ ssh.connect({
         {
             if(!debugMode)
             {
-                await ssh.execCommand(`png2sector ${parseInt(process.env.StartingSector) + i} ${digits[i]}`).then((result) =>
+                await ssh.execCommand(`png2sector ${parseInt(process.env.StartingSector) + i + 1} ${digits[i]}`).then((result) =>
                 {
-                    console.log(`Sector ${parseInt(process.env.StartingSector) + i} : ${result.stdout}`);
+                    console.log(`Sector ${parseInt(process.env.StartingSector) + i + 1} : ${result.stdout}`);
                 });
             }
         }
