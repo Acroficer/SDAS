@@ -116,9 +116,9 @@ const insertionPoints = [[1, 1], [9,1], [1, 11], [9, 11], [1, 21], [9, 21]];
 const ignoredRows = [0, 10, 20, 30, 31];
 const ignoredColumns = [0, 7, 8, 15];
 //get today's date
-const today = new Date();
+const today = new Date(Date.now());
 const year = String(today.getFullYear()).substr(2);
-const month = String(today.getMonth()).length > 1 ? String(today.getMonth()) : "0" + String(today.getMonth());
+const month = String(today.getMonth() + 1).length > 1 ? String(today.getMonth() + 1) : "0" + String(today.getMonth() + 1);
 const day = String(today.getDate()).length > 1 ? String(today.getDate()) : "0" + String(today.getDate());
 const date = day + month + year;
 console.log(`${day}/${month}/${year} or ${date}`);
