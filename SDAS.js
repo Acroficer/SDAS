@@ -74,8 +74,20 @@ ssh.connect({
         //Now, use png2sector to fill them in.
         //png2sector <sector> <imgname>
 
+        var sectorCountStr = String(sectorCount)
+        for (var i = 0; i < 4 - sectorCountStr.length; i++) //add a "B" for each blank space
+        {
+            sectorCountStr = "B" + sectorCountStr;
+        }
         for(var i = 0; i < digits.length; i++)
         {
+            //Only upload the digit if it doesn't match what is already there.
+            if (digits[i][0] == sectorCountStr[i])
+            {
+                if(debugMode) console.log(`Digit ${i}: ${digits[i]} is unchanged, skipping...`);
+                continue;
+            }
+            
             if(!debugMode)
             {
                 await ssh.execCommand(`png2sector ${parseInt(process.env.StartingSector) + i + 1} ${digits[i]}`).then((result) =>
