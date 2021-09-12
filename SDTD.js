@@ -1,6 +1,7 @@
 //SectorDisk Today's Date
 const fs = require('fs')
 const {NodeSSH} = require('node-ssh')
+const getCurrentTheme = require("./ThemeReader.js");
 require('dotenv').config();
 
 ssh = new NodeSSH();
@@ -112,9 +113,7 @@ const numbers = {
         0, 0, 0, 0, 0, 1,
         0, 0, 0, 0, 0, 1],
 }
-const insertionPoints = [[1, 1], [9,1], [1, 11], [9, 11], [1, 21], [9, 21]];
-const ignoredRows = [0, 10, 20, 30, 31];
-const ignoredColumns = [0, 7, 8, 15];
+
 //get today's date
 const today = new Date(Date.now());
 const year = String(today.getFullYear()).substr(2);
@@ -123,7 +122,7 @@ const day = String(today.getDate()).length > 1 ? String(today.getDate()) : "0" +
 const date = day + month + year;
 console.log(`${day}/${month}/${year} or ${date}`);
 
-var rawTemplate = fs.readFileSync("./Template");
+var rawTemplates = fs.readFileSync("./Tm0");
 var template = [];
 
 for (var i = 0; i < 32; i++) //load the template file into a list of rows

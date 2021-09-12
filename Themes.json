@@ -1,0 +1,32 @@
+{
+    "Default" : {
+        "Name" : "Default",
+        "BgType" : "Solid",
+        "Bg" : 0,
+        "TxtType" : "Solid",
+        "Txt": 1,
+        "Msg0" : "Heyo! Sectors 2874-2878 are used",
+        "Msg1" : "to display today's date, and the",
+        "Msg2" : "remaining unclaimed sectors.",
+        "Msg3" : "Intended for a timelapse.",
+        "Msg4" : "Hmu on Discord - Acroficer#5326"
+    },
+    "Test2" : {
+        "Name" : "Test2",
+        "BgType" : "Map",
+        "Bg" : "./Tm0",
+        "TxtType" : "Solid",
+        "Txt": 0,
+        "Start" : 9.11,
+        "End" : 9.13
+    },
+    "Test" : {
+        "Name" : "Test",
+        "BgType" : "Solid",
+        "Bg" : 1,
+        "TxtType" : "Solid",
+        "Txt": 0,
+        "Start" : 9.11,
+        "End" : 9.12
+    }
+}
