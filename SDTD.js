@@ -122,14 +122,10 @@ const day = String(today.getDate()).length > 1 ? String(today.getDate()) : "0" +
 const date = day + month + year;
 console.log(`${day}/${month}/${year} or ${date}`);
 
-var rawTemplates = fs.readFileSync("./Tm0");
-var template = [];
-
-for (var i = 0; i < 32; i++) //load the template file into a list of rows
-{
-    template.push(rawTemplate.slice(0, 16));
-    rawTemplate = rawTemplate.slice(16);
-}
+const theme = getCurrentTheme();
+const background = theme.Bg;
+const textOverlay = theme.Txt;
+var template = background;
 
 for (var i = 0; i < date.length; i++)
 {
@@ -137,17 +133,33 @@ for (var i = 0; i < date.length; i++)
     var horzOffset = 1 + 8*(i % 2);
     var vertOffset = 1 + 10*(Math.floor(i/2));
 
+
     for(var y = 0; y < 9; y++)
     {
-        for(var x = 0; x < 6; x++)
+        for (var x = 0; x < 6; x++)
         {
-            template[y + vertOffset][x + horzOffset] = numbers[String(num)][x + y*6];
+            var actualX = x + horzOffset; //real x and y values with offset factured in
+            var actualY = y + vertOffset;
+            var rawIndex = (actualY * 16) + actualX; //index used when checking the map
+            var numberIndex = (y * 6) + x; //index used when checking numbers object
+
+            if (numbers[num][numberIndex] == 1)
+            {
+                template[rawIndex] = textOverlay[rawIndex];
+            }
         }
     }
 }
-
 //Now re-assemble the template, not as a list
-template = Buffer.concat(template);
+//template = Buffer.concat(template);
+
+//Then, add the message to the end of the template
+var messageBuffer = Buffer.from(theme["Msg0"], "ascii");
+//Always 32 long.
+for(var i = 480; i < 512; i++)
+{
+    template[i] = messageBuffer[i - 480];
+}
 
 fs.writeFileSync("./output", template);
 

@@ -93,14 +93,28 @@ function getCurrentTheme(today = (new Date().getMonth() + 1) + parseFloat("0." +
         for(var i = 0; i < 5; i++)
         {
             var msg = `Msg${i}`;
-            if (workingTheme[msg] != null)
+            if (workingTheme[msg] == null)
+            {
+                workingTheme[msg] = themes["Default"][msg]; //replace missing with default
+            }
+
+            //Then do length checking and fixing
+            if(workingTheme[msg].length == 32)
             {
                 returnedTheme[msg] = workingTheme[msg];
             }
-            else
+            else if (workingTheme[msg].length > 32)
             {
+                console.log(`Theme ${workingTheme["Name"]} message ${msg} is too long, 32 char max.`);
                 returnedTheme[msg] = themes["Default"][msg];
             }
+            
+            if (workingTheme[msg].length < 32) //if shorter, fill in leading zeroes.
+            {
+                var diff = 32 - workingTheme[msg].length;
+                returnedTheme[msg] = " ".repeat(diff) + workingTheme[msg];
+            }
+            
         }
         returnedTheme.Bg = bgMap;
         returnedTheme.Txt = txtMap;

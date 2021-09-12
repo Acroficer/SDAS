@@ -75,7 +75,7 @@ typings/
 # FuseBox cache
 .fusebox/
 
-#other
+# other
 count
 output
 test.js
