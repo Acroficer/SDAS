@@ -6,10 +6,10 @@ const debugMode = Boolean(parseInt(process.env.Debug))
     Theme formatting guide:
     Name - Name of the theme, as a string.
     BgType - Solid or Map, as a string.
-    Bg - If BgType is solid, give it the index of the chosen colour. If map, a filepath to the map.
+    Bg - If BgType is solid, give it the index of the chosen colour. 
     TxtType, Txt - See above.
-    Start - A starting date in the format MM.DD, as a string. Inclusive.
-    End - An ending date in the format MM.DD, as a string. Exclusive.
+    Start - A starting date in the format MM.DD, as a number. Inclusive.
+    End - An ending date in the format MM.DD, as a number. Exclusive.
 */
 
 
@@ -18,6 +18,8 @@ const debugMode = Boolean(parseInt(process.env.Debug))
     Note that this doesn't just return the theme object itself, it modifies it so that it's of a consistent format
     For bg/txt type of map, it will load the maps into the theme object
     For bg/txt type of solid, it will generate a map, and load it into the theme object
+
+    Map types look for their map file in ./themeMaps/<theme.Name>
 */
 function getCurrentTheme(today = (new Date().getMonth() + 1) + parseFloat("0." + String(new Date().getDate())))
 {
@@ -76,7 +78,7 @@ function getCurrentTheme(today = (new Date().getMonth() + 1) + parseFloat("0." +
         }
         else if (workingTheme["BgType"] == "Map")
         {
-            bgMap = fs.readFileSync(workingTheme["Bg"]);
+            bgMap = fs.readFileSync(`./themeMaps/${workingTheme["Name"]}/Bg`);
         }
 
         if (workingTheme["TxtType"] == "Solid")
@@ -85,7 +87,7 @@ function getCurrentTheme(today = (new Date().getMonth() + 1) + parseFloat("0." +
         }
         else if (workingTheme["TxtType"] == "Map")
         {
-            txtMap = fs.readFileSync(workingTheme["Txt"]);
+            txtMap = fs.readFileSync(`./themeMaps/${workingTheme["Txt"]}/Txt`);
         }
 
         //Mapping done, now to do the messages
@@ -123,7 +125,7 @@ function getCurrentTheme(today = (new Date().getMonth() + 1) + parseFloat("0." +
 
 function validateTheme(theme)
 {
-    return (theme["Name"] && theme["Start"] && theme["End"] && theme["TxtType"] && theme["Txt"] != null && theme["BgType"] && theme["Bg"] != null)
+    return (theme["Name"] && theme["Start"] && theme["End"] && theme["TxtType"] && theme["BgType"])
 }
 
 module.exports = getCurrentTheme;
