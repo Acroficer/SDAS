@@ -4,30 +4,25 @@
         "BgType" : "Solid",
         "Bg" : 0,
         "TxtType" : "Solid",
-        "Txt": 1,
+        "Txt": 11,
         "Msg0" : "Heyo! Sectors 2874-2878 are used",
         "Msg1" : "to display today's date, and the",
         "Msg2" : "remaining unclaimed sectors.",
         "Msg3" : "Intended for a timelapse.",
         "Msg4" : "Hmu on Discord - Acroficer#5326"
     },
-    "Test2" : {
-        "Name" : "Test2",
-        "BgType" : "Solid",
-        "Bg" : 0,
+
+    "Halloween" : {
+        "Name" : "Halloween",
+        "BgType" : "Map",
         "TxtType" : "Solid",
-        "Txt": 3,
-        "Start" : 9.30,
-        "End" : 10.1,
-        "Msg3" : "Aha! A different message!"
-    },
-    "Test" : {
-        "Name" : "Test",
-        "BgType" : "Solid",
-        "Bg" : 1,
-        "TxtType" : "Solid",
-        "Txt": 0,
-        "Start" : 9.11,
-        "End" : 9.12
+        "Txt": 208,
+        "Start" : 10.01,
+        "End" : 11.01,
+        "Msg0" : "Spooky, scary skeletons",
+        "Msg1" : "Send shivers down your spine",
+        "Msg2" : "Shrieking skulls shock your soul",
+        "Msg3" : "Seal your doom tonight",
+        "Msg4" : "Hmu on Discord - Acroficer#5326"
     }
 }
