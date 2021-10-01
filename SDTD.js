@@ -163,13 +163,7 @@ for(var i = 480; i < 512; i++)
 
 fs.writeFileSync("./output", template);
 
-//Now to convert it to hexadecimal
-hexList = "";
-for (var i = 0; i < template.length; i++)
-{
-    hexList += template[i].toString(16);
-}
-console.log(hexList);
+
 //Now, upload it.
 
 ssh.connect({
