@@ -11,22 +11,22 @@ const countData = JSON.parse(fs.readFileSync("./countData"));
 var sectorCount = countData.count;
 const lastTheme = countData.theme;
 
-if(debugMode)
-{
-    console.log("Running in debug mode");
-}
+if(debugMode) console.log("Running in debug mode");
+
 
 //First, load in the theme.
 const theme = getCurrentTheme();
 const background = theme.Bg;
 const textOverlay = theme.Txt;
 
+if (debugMode) console.log(`Using theme ${theme.Name}`)
+
 if (theme.Name != lastTheme) //if these are different, we want every digit to be overwritten. The easiest way to do this is to set the sectorCount to something nonsensical, so that no digits match.
 {
     sectorCount = "EEEE"; //kind of a messy solution, find a better one.
 }
 
-function generateSector(num) //Generate a sector of number N. Takes it as a string so that we can also check for Blank.
+function generateSector(num, index) //Generate a sector of number N. Takes it as a string so that we can also check for Blank.
 {
     var template;
     if (num == "Blank" || num == "B") //load blank template, otherwise parse
@@ -52,6 +52,13 @@ function generateSector(num) //Generate a sector of number N. Takes it as a stri
         }
     }
 
+    //Then, add the message to the end of the template
+    var messageBuffer = Buffer.from(theme[`Msg${index + 1}`], "ascii"); //add 1 to the index because Msg0 is for SDTD
+    //Always 32 long.
+    for(var i = 480; i < 512; i++)
+    {
+        template[i] = messageBuffer[i - 480];
+    }
     return template;
 
 }
@@ -123,16 +130,17 @@ ssh.connect({
                 if(debugMode) console.log(`Digit ${i}: ${digits[i]} is unchanged, skipping...`);
                 continue;
             }
-            
-            var rawDigit = generateSector(digits[i]);
 
-            if(!debugMode)
+            if(!debugMode) //upload. This code is a bit messy. putFile can't take raw data, only files. So a file must be created just to upload.
             {
-                
+                fs.writeFileSync("./output", generateSector(digits[i], i));
+                await ssh.putFile(`./output`, `/usr/local/share/sectors/${process.env.StartingSector + 1 + i}`).then(function(result){
+                    console.log(result);
+                });
             }
             else //in debug mode, just write it to output
             {
-                fs.writeFileSync(`./debugOutput/${digits[i]}`, rawDigit);
+                fs.writeFileSync(`./debugOutput/${digits[i]}`, generateSector(digits[i], i));
             }
         }
 
