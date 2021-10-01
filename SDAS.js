@@ -2,18 +2,59 @@
 //Displays how many active sectors there are
 const fs = require('fs')
 const {NodeSSH} = require('node-ssh')
+const getCurrentTheme = require("./ThemeReader.js");
 require('dotenv').config();
 
 ssh = new NodeSSH();
 const debugMode = Boolean(parseInt(process.env.Debug))
-const sectorCount = parseInt(fs.readFileSync("./count"));
+const countData = JSON.parse(fs.readFileSync("./countData"));
+var sectorCount = countData.count;
+const lastTheme = countData.theme;
 
 if(debugMode)
 {
     console.log("Running in debug mode");
 }
 
+//First, load in the theme.
+const theme = getCurrentTheme();
+const background = theme.Bg;
+const textOverlay = theme.Txt;
 
+if (theme.Name != lastTheme) //if these are different, we want every digit to be overwritten. The easiest way to do this is to set the sectorCount to something nonsensical, so that no digits match.
+{
+    sectorCount = "EEEE"; //kind of a messy solution, find a better one.
+}
+
+function generateSector(num) //Generate a sector of number N. Takes it as a string so that we can also check for Blank.
+{
+    var template;
+    if (num == "Blank" || num == "B") //load blank template, otherwise parse
+    {
+        template = fs.readFileSync(`./content/raw_sectors/B`);
+    }
+    else
+    {
+        template = fs.readFileSync(`./content/raw_sectors/${parseInt(num)}`) //this will throw an error if num < 0 or num > 9. This is fine, as that should never happen, and I'd want to throw an error if it did anyway.
+    }
+
+    //Now, template will be read as a buffer. So we just gotta replace every byte with background if it's a 0, and overlay if it's 1.
+
+    for(var i = 0; i < template.length; i++)
+    {
+        if (template[i] == 0) //if background..
+        {
+            template[i] = background[i];
+        }
+        else //if text..
+        {
+            template[i] = textOverlay[i];
+        }
+    }
+
+    return template;
+
+}
 
 ssh.connect({
     host: process.env.SSH_Host,
@@ -33,14 +74,6 @@ ssh.connect({
         var output = result.stdout.split("sectors out of")[0].split("\n");
         var remainingSectors = output[output.length -1];
         
-        try
-        {
-            parseInt(remainingSectors)
-        }
-        catch
-        {
-            throw new Error(`remainingSectors should be a number, instead is ${remainingSectors}`)
-        }
 
         if (debugMode) console.log(`Sectors Claimed: ${remainingSectors}`);
 
@@ -63,13 +96,16 @@ ssh.connect({
         {
             if (remainingSectors[remainingSectors.length - i] != " ")
             {
-                digits.push(remainingSectors[remainingSectors.length - i] + ".png") //push all digits into the array
+                digits.push(remainingSectors[remainingSectors.length - i]) //push all digits into the array
             }
             else
             {
-                digits = ["Blank.png"].concat(digits); //blanks appear at the end, but we want them at the beginning
+                digits = ["B"].concat(digits); //blanks appear at the end, but we want them at the beginning
             }
         }
+
+
+
         if (debugMode) console.log(`Digits: ${digits}`);
         //Now, use png2sector to fill them in.
         //png2sector <sector> <imgname>
@@ -88,19 +124,25 @@ ssh.connect({
                 continue;
             }
             
+            var rawDigit = generateSector(digits[i]);
+
             if(!debugMode)
             {
-                await ssh.execCommand(`png2sector ${parseInt(process.env.StartingSector) + i + 1} ${digits[i]}`).then((result) =>
-                {
-                    console.log(`Sector ${parseInt(process.env.StartingSector) + i + 1} : ${result.stdout}`);
-                });
+                
+            }
+            else //in debug mode, just write it to output
+            {
+                fs.writeFileSync(`./debugOutput/${digits[i]}`, rawDigit);
             }
         }
 
         //now to update the file
         if(!debugMode)
         {
-            fs.writeFileSync("./count", remainingSectors);
+            fs.writeFileSync("./countData", JSON.stringify({
+                count: digits.join(""),
+                theme: theme.Name
+            }));
         }
         ssh.dispose();
     });

@@ -13,12 +13,13 @@
     },
     "Test2" : {
         "Name" : "Test2",
-        "BgType" : "Map",
-        "Bg" : "./Tm0",
+        "BgType" : "Solid",
+        "Bg" : 0,
         "TxtType" : "Solid",
-        "Txt": 0,
-        "Start" : 9.11,
-        "End" : 9.13
+        "Txt": 3,
+        "Start" : 9.30,
+        "End" : 10.1,
+        "Msg3" : "Aha! A different message!"
     },
     "Test" : {
         "Name" : "Test",

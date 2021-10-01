@@ -76,6 +76,5 @@ typings/
 .fusebox/
 
 # other
-count
-output
 test.js
+debugOutput
