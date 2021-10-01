@@ -1,5 +1,6 @@
 //SectorDisk Active Sectors
 //Displays how many active sectors there are
+const { Console } = require('console');
 const fs = require('fs')
 const {NodeSSH} = require('node-ssh')
 const getCurrentTheme = require("./ThemeReader.js");
@@ -80,7 +81,12 @@ ssh.connect({
 
         var output = result.stdout.split("sectors out of")[0].split("\n");
         var remainingSectors = output[output.length -1];
-        
+        remainingSectors = remainingSectors.replace(/ /g, ""); //Delete all empty spaces, since for some reason this is always 4char long, with empty spaces at the end if needed.
+
+        for (var i = 0; i < 4 - remainingSectors.length; i++) //add a "B" for each blank space, at the front.
+        {
+            remainingSectors = "B" + remainingSectors;
+        }
 
         if (debugMode) console.log(`Sectors Claimed: ${remainingSectors}`);
 
@@ -101,14 +107,7 @@ ssh.connect({
 
         for(var i = 4; i > 0; i--)
         {
-            if (remainingSectors[remainingSectors.length - i] != " ")
-            {
-                digits.push(remainingSectors[remainingSectors.length - i]) //push all digits into the array
-            }
-            else
-            {
-                digits = ["B"].concat(digits); //blanks appear at the end, but we want them at the beginning
-            }
+            digits.push(remainingSectors[remainingSectors.length - i]) //push all digits into the array
         }
 
 
@@ -133,8 +132,9 @@ ssh.connect({
 
             if(!debugMode) //upload. This code is a bit messy. putFile can't take raw data, only files. So a file must be created just to upload.
             {
-                fs.writeFileSync("./output", generateSector(digits[i], i));
-                await ssh.putFile(`./output`, `/usr/local/share/sectors/${process.env.StartingSector + 1 + i}`).then(function(result){
+                var currentSector = parseInt(process.env.StartingSector) + 1 + i;
+                fs.writeFileSync(`./output`, generateSector(digits[i], i));
+                await ssh.putFile(`./output`, `/usr/local/share/sectors/${currentSector}`).then(function(result){
                     console.log(result);
                 });
             }
